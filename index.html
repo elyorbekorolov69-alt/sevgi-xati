@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#050816">
+  <title>Sizga kichik maktub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="stars" aria-hidden="true"></canvas>
+  <canvas id="fx" aria-hidden="true"></canvas>
+  <button id="music" class="music" type="button" aria-label="Musiqani yoqish">&#9834;</button>
+
+  <main class="card" id="card">
+
+    <!-- 0. Kirish -->
+    <section class="stage active" id="s0">
+      <svg class="moon" viewBox="0 0 100 100" aria-hidden="true">
+        <defs>
+          <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#fff1c2"/>
+            <stop offset="1" stop-color="#d9a441"/>
+          </linearGradient>
+          <mask id="cut">
+            <rect width="100" height="100" fill="#fff"/>
+            <circle cx="64" cy="42" r="34" fill="#000"/>
+          </mask>
+        </defs>
+        <circle cx="46" cy="50" r="36" fill="url(#gold)" mask="url(#cut)"/>
+        <path d="M78 22l2.2 5.8 5.8 2.2-5.8 2.2L78 38l-2.2-5.8-5.8-2.2 5.8-2.2z" fill="url(#gold)"/>
+      </svg>
+      <h1>Assalomu alaykum<span class="her"></span></h1>
+      <p class="lead">Sizga kichik bir maktubim bor.</p>
+      <button class="btn gold" data-next="s1" type="button">Ochish &#10024;</button>
+    </section>
+
+    <!-- 1. Bismillah -->
+    <section class="stage" id="s1">
+      <p class="arabic" lang="ar" dir="rtl">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
+      <p class="small">Mehribon va rahmli Alloh nomi bilan</p>
+      <div class="divider"><span>&#10022;</span></div>
+      <p class="quote">&laquo;Yaxshi so&#8216;z &mdash; sadaqadir.&raquo;</p>
+      <p class="small">Hadisdan</p>
+      <button class="btn gold" data-next="s2" type="button">Davom etish</button>
+    </section>
+
+    <!-- 2. Xabar -->
+    <section class="stage" id="s2">
+      <h2>Bir oz samimiy gap</h2>
+      <p class="text">Ishxonada gaplarimiz qovushib ketganini men ham, ehtimol siz ham sezgandirsiz. Shuning uchun uni yarim yo&#8216;lda qoldirib, bir chiroyli niyat bilan aytmoqchi bo&#8216;ldim.</p>
+      <p class="text">Buni yuzma-yuz aytishdan ko&#8216;ra bu sahifani yasash osonroq bo&#8216;ldi, rostini aytsam &#128517;</p>
+      <button class="btn gold" data-next="s3" type="button">Keyingisi</button>
+    </section>
+
+    <!-- 3. Mini savollar -->
+    <section class="stage" id="s3">
+      <div class="progress" id="progress"></div>
+      <h2 id="q-title"></h2>
+      <div class="options" id="q-options"></div>
+      <p class="reaction" id="q-reaction" aria-live="polite"></p>
+    </section>
+
+    <!-- 4. Asosiy savol -->
+    <section class="stage" id="s4">
+      <h2 class="big">Men bilan yaqinroq tanishishni xohlaysizmi?</h2>
+      <p class="small">Halol niyat bilan so&#8216;rayapman.</p>
+      <div class="answers" id="answers">
+        <button class="btn yes" id="yes" type="button">Ha &#128155;</button>
+        <button class="btn ghost" id="think" type="button">O&#8216;ylab ko&#8216;raman</button>
+        <button class="btn no" id="no" type="button">Yo&#8216;q</button>
+      </div>
+      <p class="hint" id="no-hint" aria-live="polite"></p>
+    </section>
+
+    <!-- 5. Ha -->
+    <section class="stage" id="s5">
+      <div class="heart-big" aria-hidden="true">&#128156;</div>
+      <h2>Rahmat!</h2>
+      <p class="text">Eng chiroyli javobni berdingiz. Alloh xohlasa, tanishuvimiz yaxshi suhbatlarga aylanadi.</p>
+      <p class="small">Menga shu yerdan yozishingiz mumkin:</p>
+      <div class="contacts" data-contacts></div>
+    </section>
+
+    <!-- 6. O'ylab ko'raman -->
+    <section class="stage" id="s6">
+      <div class="heart-big" aria-hidden="true">&#127769;</div>
+      <h2>Shoshilmang</h2>
+      <p class="text">Yaxshi o&#8216;ylab ko&#8216;rish &mdash; to&#8216;g&#8216;ri qaror yo&#8216;li. Qaror qilgach, shu yerdan yozsangiz bo&#8216;ladi.</p>
+      <div class="contacts" data-contacts></div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
