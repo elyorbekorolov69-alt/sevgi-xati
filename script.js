@@ -8,49 +8,86 @@ const CONFIG = {
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => [...document.querySelectorAll(s)];
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-/* ---------- Ism ---------- */
-if (CONFIG.herName) {
-  $$(".her").forEach((el) => (el.textContent = ", " + CONFIG.herName));
-}
+/* ---------- Ism va kontaktlar ---------- */
+if (CONFIG.herName) $$(".her").forEach((el) => (el.textContent = ", " + CONFIG.herName));
 
-/* ---------- Kontaktlar ---------- */
-function renderContacts() {
+(function renderContacts() {
   const html = [];
-  if (CONFIG.telegram) {
-    html.push(`<a href="https://t.me/${encodeURIComponent(CONFIG.telegram)}" target="_blank" rel="noopener">Telegram orqali yozish</a>`);
-  }
-  if (CONFIG.instagram) {
-    html.push(`<a class="insta" href="https://instagram.com/${encodeURIComponent(CONFIG.instagram)}" target="_blank" rel="noopener">Instagram profilim</a>`);
-  }
-  if (!html.length) {
-    html.push(`<p class="small">Menga ishxonada aytsangiz ham bo&#8216;ladi &#128578;</p>`);
-  }
+  if (CONFIG.telegram) html.push(`<a href="https://t.me/${encodeURIComponent(CONFIG.telegram)}" target="_blank" rel="noopener">Telegram orqali yozish</a>`);
+  if (CONFIG.instagram) html.push(`<a class="insta" href="https://instagram.com/${encodeURIComponent(CONFIG.instagram)}" target="_blank" rel="noopener">Instagram profilim</a>`);
+  if (!html.length) html.push(`<p class="small">Menga ishxonada aytsangiz ham bo&#8216;ladi &#128578;</p>`);
   $$("[data-contacts]").forEach((el) => (el.innerHTML = html.join("")));
-}
-renderContacts();
+})();
 
 /* ---------- Bosqichlar ---------- */
 function go(id) {
   $$(".stage").forEach((s) => s.classList.remove("active"));
   $("#" + id).classList.add("active");
+  if (id === "s2") startLoading();
   if (id === "s3") startQuiz();
 }
 $$("[data-next]").forEach((b) => b.addEventListener("click", () => go(b.dataset.next)));
 
-/* ---------- Mini savollar ---------- */
-const QUIZ = [
-  { q: "Ishxonada choy yoki qahva?", a: ["Choy &#9749;", "Qahva", "Ikkalasi ham"], r: "Yozib qo'ydim &#128221;" },
-  { q: "Dam olish kuni qanday o'tadi?", a: ["Uyda, tinch", "Oila bilan", "Sayr va yangi joylar"], r: "Yaxshi tanlov, bu menga yoqdi &#128522;" },
-  { q: "Suhbatda sizga nima muhimroq?", a: ["Samimiylik", "Hazil", "Ikkalasi"], r: "Men uchun ham aynan shu &#128154;" }
-];
-let qi = 0;
+/* ---------- Boshlanish: eshik, kabutar, sahifa ---------- */
+$("#start").addEventListener("click", () => {
+  $("#gate").hidden = true;
+  DoveIntro.run((x, y) => {
+    const b = $("#bloom");
+    b.style.setProperty("--fx", x + "px");
+    b.style.setProperty("--fy", y + "px");
+    b.classList.remove("go");
+    void b.offsetWidth;
+    b.classList.add("go");
+    if (!reduceMotion) {
+      document.body.classList.remove("shake");
+      void document.body.offsetWidth;
+      document.body.classList.add("shake");
+      burst(x, y, 130, 40);
+    }
+    $("#page").hidden = false;
+    scrollTo(0, 0);
+  });
+});
 
-function startQuiz() {
-  qi = 0;
-  showQuestion();
+/* ---------- Jasorat yuklanmoqda ---------- */
+let loadTimer = null;
+function startLoading() {
+  clearInterval(loadTimer);
+  const bar = $("#bar"), pct = $("#pct"), msg = $("#load-msg"), next = $("#load-next");
+  next.hidden = true;
+  msg.innerHTML = "";
+  let v = 0, stalled = false;
+  const set = (n) => { v = n; bar.style.width = n + "%"; pct.textContent = Math.round(n) + "%"; };
+  set(0);
+  loadTimer = setInterval(() => {
+    if (stalled) return;
+    set(Math.min(87, v + 1 + Math.random() * 2));
+    if (v > 20 && v < 40) msg.innerHTML = "Biroz ikkilanish topildi...";
+    if (v >= 60 && v < 80) msg.innerHTML = "Yuragim tez ura boshladi...";
+    if (v >= 87) {
+      stalled = true;
+      msg.innerHTML = "Qolgan 13% kelmayapti &#128517;";
+      setTimeout(() => {
+        set(100);
+        msg.innerHTML = "Mayli, baribir aytaman!";
+        next.hidden = false;
+        clearInterval(loadTimer);
+      }, 1800);
+    }
+  }, 90);
 }
 
+/* ---------- Hazilli savollar ---------- */
+const QUIZ = [
+  { q: "Ishxonada eng yaxshi payt qaysi?", a: ["Choy tanaffusi &#9749;", "Maosh kuni &#128516;", "Dam olish kuni yaqinlashganda"], r: ["Choy tanaffusini hech kim yomon ko'rmaydi", "Bu javobga hamma qo'shiladi", "Juma kuni soat 17:00 &#128513;"] },
+  { q: "Suhbatda sizga nima yoqadi?", a: ["Samimiylik", "Yengil hazil", "Ikkalasi ham"], r: ["Men ham shunday o'ylayman", "Hazilga hazil bilan javob beraman &#128521;", "Demak, til topishamiz"] },
+  { q: "Tanishish uchun sayt yasash qanday fikr?", a: ["G'alati &#128517;", "Qiziq", "Chiroyli fikr"], r: ["Rostini aytganingiz uchun rahmat &#128514;", "Qiziqish yaxshi belgi", "Rahmat, ancha tirishdim &#128522;"] }
+];
+let qi = 0;
+function startQuiz() { qi = 0; showQuestion(); }
 function showQuestion() {
   const item = QUIZ[qi];
   $("#progress").innerHTML = QUIZ.map((_, i) => `<i class="${i <= qi ? "on" : ""}"></i>`).join("");
@@ -58,7 +95,7 @@ function showQuestion() {
   $("#q-reaction").innerHTML = "";
   const box = $("#q-options");
   box.innerHTML = "";
-  item.a.forEach((text) => {
+  item.a.forEach((text, idx) => {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "btn";
@@ -66,41 +103,66 @@ function showQuestion() {
     b.addEventListener("click", () => {
       $$("#q-options .btn").forEach((x) => (x.disabled = true));
       b.classList.add("picked");
-      $("#q-reaction").innerHTML = item.r;
+      $("#q-reaction").innerHTML = item.r[idx];
       setTimeout(() => {
         qi++;
         if (qi < QUIZ.length) showQuestion();
         else go("s4");
-      }, 1100);
+      }, 1400);
     });
     box.appendChild(b);
   });
 }
 
+/* ---------- Baholash ---------- */
+(function rating() {
+  const wrap = $("#stars"), msg = $("#star-msg"), next = $("#star-next");
+  const btns = [...wrap.querySelectorAll("button")];
+  const paint = (n) => btns.forEach((b, i) => b.classList.toggle("on", i < n));
+  btns.forEach((b) => {
+    b.addEventListener("mouseenter", () => { if (!wrap.classList.contains("locked")) paint(+b.dataset.v); });
+    b.addEventListener("click", () => {
+      const v = +b.dataset.v;
+      wrap.classList.add("locked");
+      paint(v);
+      if (v === 5) {
+        msg.innerHTML = "Rahmat, xursand bo'ldim &#128522;";
+        next.hidden = false;
+        return;
+      }
+      msg.innerHTML = v === 4
+        ? "4? Bitta yulduzcha yetishmayotgan ekan, qo'shib qo'ydim &#128516;"
+        : "Bu xatolik bo'lsa kerak, 5 ga to'g'rilab qo'ydim &#128517;";
+      let n = v;
+      const t = setInterval(() => {
+        n++;
+        paint(n);
+        if (n >= 5) { clearInterval(t); next.hidden = false; }
+      }, 350);
+    });
+  });
+})();
+
 /* ---------- Asosiy savol: qochuvchi "Yo'q" ---------- */
-const yes = $("#yes");
-const no = $("#no");
-const hint = $("#no-hint");
-const NO_TEXTS = [
-  "Yo'q",
-  "Ishonchingiz komilmi?",
-  "Bir o'ylab ko'ring &#129402;",
+const yes = $("#yes"), no = $("#no"), hint = $("#no-hint");
+const THINK = [
+  "Yaxshilab o'ylab ko'ring &#129300;",
+  "Bir marta ham o'ylab ko'rmadingiz-ku",
+  "Yana bir bor o'ylab ko'ring",
   "Tugma ham ketvoldi &#128517;",
-  "Ushlab bo'lmaydi-ku",
-  "Yana bir urinib ko'ring",
+  "O'ylab ko'rish hech kimga zarar qilmagan",
+  "Yana urinib ko'ring",
   "Men charchadim..."
 ];
 let dodges = 0;
-
 function dodge(e) {
   e.preventDefault();
   if (no.classList.contains("gone")) return;
   dodges++;
-  no.innerHTML = NO_TEXTS[Math.min(dodges, NO_TEXTS.length - 1)];
+  no.innerHTML = "Yo'q";
+  hint.innerHTML = THINK[Math.min(dodges - 1, THINK.length - 1)];
   no.style.position = "fixed";
-  const pad = 14;
-  const w = no.offsetWidth;
-  const h = no.offsetHeight;
+  const pad = 14, w = no.offsetWidth, h = no.offsetHeight;
   no.style.left = pad + Math.random() * Math.max(10, innerWidth - w - pad * 2) + "px";
   no.style.top = pad + Math.random() * Math.max(10, innerHeight - h - pad * 2) + "px";
   yes.style.transform = `scale(${Math.min(1 + dodges * 0.07, 1.4)})`;
@@ -112,111 +174,72 @@ function dodge(e) {
 ["pointerenter", "pointerdown", "click", "touchstart"].forEach((ev) => no.addEventListener(ev, dodge, { passive: false }));
 
 yes.addEventListener("click", () => {
-  go("s5");
-  celebrate();
+  go("s6");
+  burst(innerWidth / 2, innerHeight * 0.55, 160, 40);
 });
-$("#think").addEventListener("click", () => go("s6"));
+$("#think").addEventListener("click", () => go("s7"));
 
-/* ---------- Yulduzli osmon ---------- */
-const sc = $("#stars");
-const sctx = sc.getContext("2d");
-let stars = [];
-let shoot = null;
-const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
+/* ---------- Tushayotgan gul barglari ---------- */
+const pc = $("#petals"), pctx = pc.getContext("2d");
+let petals = [];
+const PETAL_COLORS = ["#f7b6c4", "#ffd3dc", "#f9c2a5", "#ffe0cf", "#f2a0b4"];
 function sizeCanvas(c, ctx) {
   c.width = innerWidth * dpr;
   c.height = innerHeight * dpr;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
-function initStars() {
-  sizeCanvas(sc, sctx);
-  const n = Math.round((innerWidth * innerHeight) / 5500);
-  stars = Array.from({ length: n }, () => ({
-    x: Math.random() * innerWidth,
-    y: Math.random() * innerHeight,
-    r: Math.random() * 1.4 + 0.3,
-    p: Math.random() * Math.PI * 2,
-    s: Math.random() * 0.02 + 0.005
-  }));
+function newPetal(any) {
+  return { x: Math.random() * innerWidth, y: any ? Math.random() * innerHeight : -20, s: Math.random() * 6 + 5, v: Math.random() * 0.6 + 0.4, p: Math.random() * 6, c: PETAL_COLORS[(Math.random() * PETAL_COLORS.length) | 0] };
 }
-function drawStars() {
-  sctx.clearRect(0, 0, innerWidth, innerHeight);
-  for (const s of stars) {
-    s.p += s.s;
-    const a = 0.45 + Math.sin(s.p) * 0.4;
-    sctx.fillStyle = `rgba(255, 244, 214, ${a})`;
-    sctx.beginPath();
-    sctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    sctx.fill();
-  }
-  if (!shoot && Math.random() < 0.004) {
-    shoot = { x: Math.random() * innerWidth * 0.8, y: Math.random() * innerHeight * 0.4, l: 0 };
-  }
-  if (shoot) {
-    shoot.x += 9;
-    shoot.y += 4;
-    shoot.l += 1;
-    const g = sctx.createLinearGradient(shoot.x, shoot.y, shoot.x - 70, shoot.y - 31);
-    g.addColorStop(0, "rgba(255,241,194,.9)");
-    g.addColorStop(1, "rgba(255,241,194,0)");
-    sctx.strokeStyle = g;
-    sctx.lineWidth = 2;
-    sctx.beginPath();
-    sctx.moveTo(shoot.x, shoot.y);
-    sctx.lineTo(shoot.x - 70, shoot.y - 31);
-    sctx.stroke();
-    if (shoot.l > 40) shoot = null;
-  }
-  requestAnimationFrame(drawStars);
+function initPetals() {
+  sizeCanvas(pc, pctx);
+  petals = Array.from({ length: Math.min(26, Math.round(innerWidth / 50)) }, () => newPetal(true));
 }
-initStars();
-drawStars();
-addEventListener("resize", () => {
-  initStars();
-  sizeCanvas(fc, fctx);
-});
+function drawPetals(t) {
+  pctx.clearRect(0, 0, innerWidth, innerHeight);
+  for (const p of petals) {
+    p.y += p.v;
+    p.x += Math.sin(t / 900 + p.p) * 0.7 + 0.2;
+    if (p.y > innerHeight + 20) Object.assign(p, newPetal(false));
+    pctx.save();
+    pctx.translate(p.x, p.y);
+    pctx.rotate(Math.sin(t / 700 + p.p) * 1.2);
+    pctx.scale(1, Math.abs(Math.cos(t / 600 + p.p)) * 0.7 + 0.3);
+    pctx.fillStyle = p.c;
+    pctx.beginPath();
+    pctx.ellipse(0, 0, p.s, p.s * 0.55, 0, 0, 7);
+    pctx.fill();
+    pctx.restore();
+  }
+  if (!reduceMotion) requestAnimationFrame(drawPetals);
+}
+initPetals();
+requestAnimationFrame(drawPetals);
 
-/* ---------- Konfetti va yuraklar ---------- */
-const fc = $("#fx");
-const fctx = fc.getContext("2d");
+/* ---------- Gul barglari va yuraklar portlashi ---------- */
+const fc = $("#fx"), fctx = fc.getContext("2d");
 sizeCanvas(fc, fctx);
-let parts = [];
-let fxRunning = false;
-const COLORS = ["#e8c872", "#fff1c2", "#eaa6bd", "#ffd9e6", "#b9a7ff"];
+addEventListener("resize", () => { initPetals(); sizeCanvas(fc, fctx); });
+let parts = [], fxRunning = false;
+const BURST_COLORS = ["#f7b6c4", "#ffd3dc", "#f9c2a5", "#fff0d2", "#e58a9e", "#f6c26b"];
 
-function celebrate() {
-  for (let i = 0; i < 160; i++) {
-    const heart = Math.random() < 0.3;
-    parts.push({
-      x: innerWidth / 2 + (Math.random() - 0.5) * 80,
-      y: innerHeight * 0.55,
-      vx: (Math.random() - 0.5) * 12,
-      vy: -Math.random() * 14 - 4,
-      g: 0.22,
-      size: heart ? 18 + Math.random() * 12 : 5 + Math.random() * 6,
-      rot: Math.random() * 6,
-      vr: (Math.random() - 0.5) * 0.3,
-      c: COLORS[(Math.random() * COLORS.length) | 0],
-      heart,
-      life: 0
-    });
+function burst(x, y, n, hearts) {
+  if (reduceMotion) return;
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2, v = Math.random() * 12 + 3;
+    parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 5, g: 0.2, size: 6 + Math.random() * 7, rot: Math.random() * 6, vr: (Math.random() - 0.5) * 0.3, c: BURST_COLORS[i % BURST_COLORS.length], heart: false, life: 0 });
   }
-  if (!fxRunning) {
-    fxRunning = true;
-    requestAnimationFrame(fxLoop);
+  for (let i = 0; i < hearts; i++) {
+    const a = Math.random() * Math.PI * 2, v = Math.random() * 9 + 3;
+    parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 6, g: 0.2, size: 16 + Math.random() * 12, rot: 0, vr: 0, heart: true, life: 0 });
   }
+  if (!fxRunning) { fxRunning = true; requestAnimationFrame(fxLoop); }
 }
 function fxLoop() {
   fctx.clearRect(0, 0, innerWidth, innerHeight);
   parts = parts.filter((p) => p.y < innerHeight + 40 && p.life < 260);
   for (const p of parts) {
-    p.vy += p.g;
-    p.vx *= 0.99;
-    p.x += p.vx;
-    p.y += p.vy;
-    p.rot += p.vr;
-    p.life++;
+    p.vy += p.g; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life++;
     fctx.save();
     fctx.translate(p.x, p.y);
     fctx.rotate(p.rot);
@@ -224,10 +247,12 @@ function fxLoop() {
     if (p.heart) {
       fctx.font = p.size + "px serif";
       fctx.textAlign = "center";
-      fctx.fillText("\u{1F49B}", 0, 0);
+      fctx.fillText("\u{1F497}", 0, 0);
     } else {
       fctx.fillStyle = p.c;
-      fctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+      fctx.beginPath();
+      fctx.ellipse(0, 0, p.size, p.size * 0.55, 0, 0, 7);
+      fctx.fill();
     }
     fctx.restore();
   }
@@ -235,25 +260,15 @@ function fxLoop() {
   else fxRunning = false;
 }
 
-/* ---------- Yengil musiqa (tashqi fayl kerak emas) ---------- */
+/* ---------- Yengil musiqa (tugma bilan yoqiladi) ---------- */
 const musicBtn = $("#music");
-let ac = null;
-let master = null;
-let chordTimer = null;
-let chordIndex = 0;
-const CHORDS = [
-  [220, 261.63, 329.63],
-  [174.61, 220, 261.63],
-  [261.63, 329.63, 392],
-  [196, 246.94, 293.66]
-];
-
+let ac = null, master = null, chordTimer = null, chordIndex = 0;
+const CHORDS = [[261.63, 329.63, 392], [220, 261.63, 329.63], [174.61, 220, 261.63], [196, 246.94, 293.66]];
 function playChord() {
   const t = ac.currentTime;
   CHORDS[chordIndex % CHORDS.length].forEach((f) => {
     [f, f * 2].forEach((freq, k) => {
-      const o = ac.createOscillator();
-      const g = ac.createGain();
+      const o = ac.createOscillator(), g = ac.createGain();
       o.type = k ? "sine" : "triangle";
       o.frequency.value = freq;
       g.gain.setValueAtTime(0, t);
@@ -266,7 +281,6 @@ function playChord() {
   });
   chordIndex++;
 }
-
 musicBtn.addEventListener("click", () => {
   if (!ac) {
     const AC = window.AudioContext || window.webkitAudioContext;
