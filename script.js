@@ -178,6 +178,7 @@ yes.addEventListener("click", () => {
   burst(innerWidth / 2, innerHeight * 0.55, 160, 40);
 });
 $("#think").addEventListener("click", () => go("s7"));
+$("#polite").addEventListener("click", () => go("s8"));
 
 /* ---------- Tushayotgan gul barglari ---------- */
 const pc = $("#petals"), pctx = pc.getContext("2d");

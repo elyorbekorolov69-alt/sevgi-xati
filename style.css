@@ -203,6 +203,14 @@ button:focus-visible { outline: 2px solid var(--rose); outline-offset: 3px; }
 }
 .contacts a.insta { background: linear-gradient(135deg, #e58a9e, #f1b087); }
 
+/* Halol rad tugmasi */
+.linkbtn {
+  font-family: var(--ui); font-size: .95rem; font-weight: 700;
+  color: var(--muted); background: none; border: 0; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 3px; padding: 8px 12px;
+}
+.linkbtn:hover { color: var(--rose); }
+
 /* Musiqa */
 .music {
   position: fixed; top: 14px; right: 14px; z-index: 10; width: 42px; height: 42px;
