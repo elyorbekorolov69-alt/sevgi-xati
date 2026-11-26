@@ -1,7 +1,8 @@
 // ====== SOZLAMALAR: faqat shu yerni to'ldiring ======
 const CONFIG = {
   herName: "",     // uning ismi (bo'sh qolsa, ko'rsatilmaydi)
-  telegram: "",    // Telegram username, @ belgisiz. Masalan: "elyor123"
+  telegram: "Urolov20_05",    // Telegram username, @ belgisiz. Masalan: "elyor123"
+  telegramText: "Assalomu alaykum, maktubingizni oldim",  // Telegram chatida tayyor turadigan yozuv (bo'sh qolsa, chat bo'sh ochiladi)
   instagram: ""    // Instagram username, @ belgisiz. Masalan: "elyor.123"
 };
 // =====================================================
@@ -16,7 +17,10 @@ if (CONFIG.herName) $$(".her").forEach((el) => (el.textContent = ", " + CONFIG.h
 
 (function renderContacts() {
   const html = [];
-  if (CONFIG.telegram) html.push(`<a href="https://t.me/${encodeURIComponent(CONFIG.telegram)}" target="_blank" rel="noopener">Telegram orqali yozish</a>`);
+  if (CONFIG.telegram) {
+    const q = CONFIG.telegramText ? "?text=" + encodeURIComponent(CONFIG.telegramText) : "";
+    html.push(`<a href="https://t.me/${encodeURIComponent(CONFIG.telegram)}${q}" target="_blank" rel="noopener">Telegram orqali yozish</a>`);
+  }
   if (CONFIG.instagram) html.push(`<a class="insta" href="https://instagram.com/${encodeURIComponent(CONFIG.instagram)}" target="_blank" rel="noopener">Instagram profilim</a>`);
   if (!html.length) html.push(`<p class="small">Menga ishxonada aytsangiz ham bo&#8216;ladi &#128578;</p>`);
   $$("[data-contacts]").forEach((el) => (el.innerHTML = html.join("")));
