@@ -21,9 +21,16 @@ if (CONFIG.herName) $$(".her").forEach((el) => (el.textContent = ", " + CONFIG.h
     const q = CONFIG.telegramText ? "?text=" + encodeURIComponent(CONFIG.telegramText) : "";
     html.push(`<a href="https://t.me/${encodeURIComponent(CONFIG.telegram)}${q}" target="_blank" rel="noopener">Telegram orqali yozish</a>`);
   }
+  if (CONFIG.telegram) html.push(`<button type="button" class="copy" data-copy="@${CONFIG.telegram}">Username nusxalash: @${CONFIG.telegram}</button>`);
   if (CONFIG.instagram) html.push(`<a class="insta" href="https://instagram.com/${encodeURIComponent(CONFIG.instagram)}" target="_blank" rel="noopener">Instagram profilim</a>`);
   if (!html.length) html.push(`<p class="small">Menga ishxonada aytsangiz ham bo&#8216;ladi &#128578;</p>`);
-  $$("[data-contacts]").forEach((el) => (el.innerHTML = html.join("")));
+  $$("[data-contacts]").forEach((el) => {
+    el.innerHTML = html.join("");
+    el.querySelectorAll(".copy").forEach((b) => b.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = "Nusxalandi \u2713"; }
+      catch (e) { b.textContent = b.dataset.copy; }
+    }));
+  });
 })();
 
 /* ---------- Bosqichlar ---------- */
@@ -105,13 +112,18 @@ function startLoading() {
 
 /* ---------- Hazilli savollar ---------- */
 const QUIZ = [
-  { q: "Ishxonada eng yaxshi payt qaysi?", a: ["Choy tanaffusi &#9749;", "Maosh kuni &#128516;", "Dam olish kuni yaqinlashganda"], r: ["Choy tanaffusini hech kim yomon ko'rmaydi", "Bu javobga hamma qo'shiladi", "Juma kuni soat 17:00 &#128513;"] },
-  { q: "Suhbatda sizga nima yoqadi?", a: ["Samimiylik", "Yengil hazil", "Ikkalasi ham"], r: ["Men ham shunday o'ylayman", "Hazilga hazil bilan javob beraman &#128521;", "Demak, til topishamiz"] },
-  { q: "Dushanba ertalab qanday kayfiyatda bo'lasiz?", a: ["Hali uyquda &#128564;", "Choy bo'lsa tirilaman &#9749;", "Dushanbani yaxshi ko'raman"], r: ["Hammamiz bir qayiqdamiz &#128516;", "Choy ishxonaning yoqilg'isi", "Siz noyob odamsiz &#128563;"] },
-  { q: "Ishxonada kompyuter qotib qolsa, nima qilasiz?", a: ["Sabr bilan kutaman", "Qayta yoqaman", "Yordam so'rayman"], r: ["Sabr qilgan murodiga yetadi &#128522;", "Eng sinalgan usul &#128514;", "Yordam so'rash aqlli ish"] },
-  { q: "Telefoningizda nechta o'qilmagan xabar bor?", a: ["Nolta, tartibliman", "Yigirmatacha", "Sanashdan qo'rqaman"], r: ["Menga ham o'rgating &#128517;", "Men ham shunga yaqinman", "Sanamang, yaxshisi &#128514;"] },
-  { q: "Bu sahifani yasash qancha vaqt oldi deb o'ylaysiz?", a: ["Bir daqiqa", "Bir kecha", "Butun hafta"], r: ["Kaş shunchalik tez bo'lsa &#128516;", "Juda yaqin topdingiz", "Deyarli shunday, sabringiz uchun rahmat &#128522;"] },
-  { q: "Sahifa shu yergacha yoqdimi?", a: ["Ha, yoqdi", "Ozgina kulgim keldi", "Davom eting-chi"], r: ["Xursand bo'ldim &#128522;", "Maqsad ham shu edi &#128516;", "Oz qoldi, sabr qiling"] }
+  { q: "Ishxonada eng yaxshi payt qaysi?", a: ["Choy tanaffusi &#9749;", "Maosh kuni &#128516;", "Dam olish kuni yaqinlashganda", "Ish tugagan payt &#127939;"], r: ["Choy tanaffusini hech kim yomon ko'rmaydi", "Bu javobga hamma qo'shiladi", "Juma kuni soat 17:00 &#128513;", "Eshik oldida navbat bor ekan-da &#128514;"] },
+  { q: "Suhbatda sizga nima yoqadi?", a: ["Samimiylik", "Yengil hazil", "Ikkalasi ham", "Jim o'tirish &#128566;"], r: ["Men ham shunday o'ylayman", "Hazilga hazil bilan javob beraman &#128521;", "Demak, til topishamiz", "Unda men gapirib o'tiraman, siz tinglang &#128517;"] },
+  { q: "Qaysi biri sizga ko'proq mos?", a: ["Ertalabki odam &#127749;", "Kechki odam &#127769;", "Tushdan keyin tirilaman", "Har doim uyquliman &#128564;"], r: ["Ertalab choy birga ichsak bo'larkan", "Kech yozishsak javob berarsiz-a &#128521;", "Unda tushlik payti gaplashamiz", "Hammamiz bir qayiqdamiz &#128516;"] },
+  { q: "Do'st bo'lishda eng muhimi nima?", a: ["Halollik", "Hazil tuyg'usi", "Hurmat", "Vaqtida javob berish &#128241;"], r: ["Eng to'g'ri javob, men ham shuni tanlardim", "Bu bor, va'da beraman &#128516;", "Men uchun ham birinchi o'rinda", "Men harakat qilaman, siz ham shoshiling &#128514;"] },
+  { q: "Dushanba ertalab qanday kayfiyatda bo'lasiz?", a: ["Hali uyquda &#128564;", "Choy bo'lsa tirilaman &#9749;", "Dushanbani yaxshi ko'raman", "Dushanba nima? &#128563;"], r: ["Hammamiz bir qayiqdamiz &#128516;", "Choy ishxonaning yoqilg'isi", "Siz noyob odamsiz &#128563;", "Sizga hasad qilaman &#128514;"] },
+  { q: "Birga choy ichsak, nima bilan ichasiz?", a: ["Shirinlik bilan &#127856;", "Nonushta bilan", "Yolg'iz choyning o'zi", "Gap bilan &#128172;"], r: ["Shirinlik men tomondan &#128522;", "Shu ham yaxshi fikr", "Sodda va sof, yoqdi", "Eng yaxshi qo'shimcha, gap tugamasin &#128516;"] },
+  { q: "Telefoningizda nechta o'qilmagan xabar bor?", a: ["Nolta, tartibliman", "Yigirmatacha", "Sanashdan qo'rqaman", "Mingdan ko'p &#128561;"], r: ["Menga ham o'rgating &#128517;", "Men ham shunga yaqinman", "Sanamang, yaxshisi &#128514;", "Unda mening xabarim eng oxirida qoladi-da &#128517;"] },
+  { q: "Ishxonada kompyuter qotib qolsa, nima qilasiz?", a: ["Sabr bilan kutaman", "Qayta yoqaman", "Yordam so'rayman", "Choy ichgani ketaman &#9749;"], r: ["Sabr qilgan murodiga yetadi &#128522;", "Eng sinalgan usul &#128514;", "Yordam so'rash aqlli ish", "Eng to'g'ri qaror &#128516;"] },
+  { q: "Hazilga qanday qaraysiz?", a: ["Hazil kerak, ayniqsa ishda", "Kulaman, lekin ichimda", "Hazilni tushunmayman &#128517;", "O'zim hazil qilaman &#128526;"], r: ["Demak, bu sahifa to'g'ri joyga keldi &#128516;", "Men ham ichimda ancha kulaman", "Unda aytmay qo'ya qolaman &#128514;", "Raqobat bo'ladi &#128513;"] },
+  { q: "Bu sahifani yasash qancha vaqt oldi deb o'ylaysiz?", a: ["Bir daqiqa", "Bir kecha", "Butun hafta", "Aytmayman, sir &#128566;"], r: ["Kash shunchalik tez bo'lsa &#128516;", "Juda yaqin topdingiz", "Deyarli shunday, sabringiz uchun rahmat &#128522;", "Sir saqlay bilasiz, yoqdi &#128522;"] },
+  { q: "Gaplashish uchun eng yaxshi usul qaysi?", a: ["Yuzma-yuz", "Xabar yozib", "Ovozli xabar &#127908;", "Sayt orqali &#128517;"], r: ["Bir kun shunday bo'lar, insha Alloh", "Shu ham qulay", "Men uzun xabarlar yozaman, tayyor turing &#128514;", "Mana, hozir shunday gaplashyapmiz &#128516;"] },
+  { q: "Sahifa shu yergacha yoqdimi?", a: ["Ha, yoqdi", "Ozgina kulgim keldi", "Davom eting-chi", "Biroz hayron bo'ldim &#128563;"], r: ["Xursand bo'ldim &#128522;", "Maqsad ham shu edi &#128516;", "Oz qoldi, sabr qiling", "Hayron bo'lish ham yaxshi &#128522;"] }
 ];
 let qi = 0;
 function startQuiz() { qi = 0; showQuestion(); }
@@ -175,18 +187,54 @@ const yes = $("#yes"), no = $("#no"), hint = $("#no-hint");
 const THINK = [
   "Yaxshilab o'ylab ko'ring &#129300;",
   "Bir marta ham o'ylab ko'rmadingiz-ku",
-  "Yana bir bor o'ylab ko'ring",
   "Tugma ham ketvoldi &#128517;",
   "O'ylab ko'rish hech kimga zarar qilmagan",
-  "Yana bir bor o'ylab ko'ring &#128522;"
+  "Bu tugma sizdan uyalyapti shekilli",
+  "Ushlab ko'ring-chi, ushlay olmaysiz &#128540;",
+  "\"Yo'q\" tugmasi bugun ta'tilda",
+  "Qarang, \"Ha\" tugmasi kattalashib boryapti &#128522;",
+  "Men sabrliman, kutaman",
+  "Sal sekinroq bosing, qochib ketyapti-ku",
+  "Hozir tugma boshqa joyda, siz bilan o'ynashyapti",
+  "Bu tugma buzilgan chog'i &#128517;",
+  "Aytmoqchi bo'lganingiz \"Ha\" edi, to'g'rimi?",
+  "Yuragingiz \"Ha\" deyapti, barmog'ingiz xato qilyapti",
+  "Iltimos, bir marta jiddiy o'ylab ko'ring",
+  "Bunaqa tez-tez bosmang, tugma charchadi",
+  "Yo'q tugmasi: \"Men bu ishga yollanmaganman\"",
+  "Mana, yana qochdi. Tabiat qonuni",
+  "Choy ichib o'ylab ko'rsangiz ham bo'ladi &#127861;",
+  "Ha tugmasi sizni kutib turibdi &#128155;",
+  "Bu yerda \"Yo'q\" ishlamaydi, kechirasiz",
+  "Halol niyat bilan so'rayapman, rostdan",
+  "Hech zarari yo'q, shunchaki do'stlik",
+  "Tugmani tutish uchun avval \"Ha\" ni bosing &#128540;",
+  "Yo'q tugmasi sizdan qochishni yaxshi ko'radi",
+  "Ha bosish uchun hech narsa talab qilinmaydi",
+  "Tugma tez, siz tezroq bo'lishingiz kerak &#128514;",
+  "Sizdan boshqa hamma tugmani ushlay olardi",
+  "Bir nafas oling, keyin \"Ha\" ni bosing &#128522;",
+  "Qizil tugma emas, qochuvchi tugma bu",
+  "Menga ham kulgi keldi, mayli",
+  "Siz bilan o'ynash yoqyapti, davom eting &#128516;",
+  "Tugma g'oyib bo'lmasidan oldin o'ylab ko'ring",
+  "Aytilmagan javob ham javob, lekin \"Ha\" yaxshiroq &#128155;"
 ];
+const NO_LABELS = ["Yo'q", "Yo'q?", "Yo'qmi?", "Yo'q...", "Yo'q &#128584;", "Yo'q-yo'q", "Yo'q &#128517;"];
+let order = [];
+function nextThink() {
+  if (!order.length) {
+    order = THINK.map((_, i) => i).sort(() => Math.random() - 0.5);
+  }
+  return THINK[order.pop()];
+}
 let dodges = 0;
 function dodge(e) {
   e.preventDefault();
   if (no.classList.contains("gone")) return;
   dodges++;
-  no.innerHTML = "Yo'q";
-  hint.innerHTML = THINK[(dodges - 1) % THINK.length];
+  no.innerHTML = NO_LABELS[(Math.random() * NO_LABELS.length) | 0];
+  hint.innerHTML = nextThink();
   no.style.position = "fixed";
   const pad = 14, w = no.offsetWidth, h = no.offsetHeight;
   if (!no.dataset.moved) {
@@ -207,7 +255,7 @@ function dodge(e) {
     $("#polite").getBoundingClientRect(),
     $("#music").getBoundingClientRect()
   ];
-  const clash = (x, y) => avoid.some((r) => x < r.right + 12 && x + w > r.left - 12 && y < r.bottom + 12 && y + h > r.top - 12);
+  const clash = (x, y) => avoid.some((r) => x < r.right + 24 && x + w > r.left - 24 && y < r.bottom + 24 && y + h > r.top - 24);
   let x = pad, y = pad;
   for (let i = 0; i < 60; i++) {
     x = pad + Math.random() * Math.max(10, innerWidth - w - pad * 2);
@@ -218,6 +266,13 @@ function dodge(e) {
   const cr = $("#card").getBoundingClientRect();
   no.style.left = x - cr.left + "px";
   no.style.top = y - cr.top + "px";
+  // Xavfsizlik: joylashgach "Ha" ustiga tushib qolgan bo'lsa, yana bir marta qochadi
+  clearTimeout(dodge.t);
+  dodge.t = setTimeout(() => {
+    const a = no.getBoundingClientRect(), c = yes.getBoundingClientRect();
+    const hit = !(a.right + 8 <= c.left || c.right + 8 <= a.left || a.bottom + 8 <= c.top || c.bottom + 8 <= a.top);
+    if (hit && !dodge.again) { dodge.again = true; dodge(new Event("x")); dodge.again = false; }
+  }, 320);
 }
 ["pointerenter", "pointerdown", "click", "touchstart"].forEach((ev) => no.addEventListener(ev, dodge, { passive: false }));
 

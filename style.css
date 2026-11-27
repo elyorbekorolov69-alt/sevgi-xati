@@ -168,8 +168,8 @@ h2.big { font-size: 1.55rem; }
 .options { display: grid; gap: 10px; width: 100%; }
 .options .glass-btn { width: 100%; font-weight: 700; }
 .options .glass-btn.picked { background: linear-gradient(135deg, rgba(255, 255, 255, .8), rgba(255, 190, 205, .7)); opacity: 1; }
-.progress { display: flex; gap: 6px; }
-.progress i { width: 22px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, .5); }
+.progress { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
+.progress i { width: 16px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, .5); }
 .progress i.on { background: var(--rose); }
 
 /* Yulduzchalar */
@@ -217,4 +217,10 @@ h2.big { font-size: 1.55rem; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+.contacts .copy {
+  font-family: var(--ui); font-weight: 700; font-size: .9rem; color: var(--ink);
+  padding: 12px 18px; border-radius: 999px; cursor: pointer;
+  background: rgba(255, 255, 255, .45); border: 1px solid var(--glass-line);
 }
