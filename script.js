@@ -35,26 +35,45 @@ function go(id) {
 }
 $$("[data-next]").forEach((b) => b.addEventListener("click", () => go(b.dataset.next)));
 
-/* ---------- Boshlanish: eshik, kabutar, sahifa ---------- */
-$("#start").addEventListener("click", () => {
-  $("#gate").hidden = true;
-  DoveIntro.run((x, y) => {
-    const b = $("#bloom");
-    b.style.setProperty("--fx", x + "px");
-    b.style.setProperty("--fy", y + "px");
-    b.classList.remove("go");
-    void b.offsetWidth;
-    b.classList.add("go");
-    if (!reduceMotion) {
-      document.body.classList.remove("shake");
-      void document.body.offsetWidth;
-      document.body.classList.add("shake");
-      burst(x, y, 130, 40);
-    }
+/* ---------- Boshlanish: eshik, video, sahifa ---------- */
+const vid = $("#intro"), skipBtn = $("#skip");
+let revealed = false;
+function reveal() {
+  if (revealed) return;
+  revealed = true;
+  skipBtn.hidden = true;
+  try { vid.pause(); } catch (e) {}
+  $("#bg").classList.add("soft");
+  vid.classList.remove("show");
+  $("#petals").classList.remove("off");
+  const w = innerWidth / 2, h = innerHeight * 0.5;
+  if (!reduceMotion) {
+    document.body.classList.remove("shake");
+    void document.body.offsetWidth;
+    document.body.classList.add("shake");
+    burst(w, h, 90, 30);
+  }
+  setTimeout(() => {
     $("#page").hidden = false;
     scrollTo(0, 0);
-  });
+  }, reduceMotion ? 0 : 450);
+}
+$("#start").addEventListener("click", () => {
+  const gate = $("#gate");
+  gate.classList.add("fade");
+  setTimeout(() => (gate.hidden = true), 600);
+  if (reduceMotion) { reveal(); return; }
+  $("#petals").classList.add("off");
+  vid.classList.add("show");
+  skipBtn.hidden = false;
+  vid.currentTime = 0;
+  const p = vid.play();
+  if (p && p.catch) p.catch(reveal);
+  vid.addEventListener("ended", reveal, { once: true });
+  vid.addEventListener("error", reveal, { once: true });
+  setTimeout(reveal, 9000);
 });
+skipBtn.addEventListener("click", reveal);
 
 /* ---------- Jasorat yuklanmoqda ---------- */
 let loadTimer = null;
@@ -106,10 +125,10 @@ function showQuestion() {
   item.a.forEach((text, idx) => {
     const b = document.createElement("button");
     b.type = "button";
-    b.className = "btn";
+    b.className = "glass-btn";
     b.innerHTML = text;
     b.addEventListener("click", () => {
-      $$("#q-options .btn").forEach((x) => (x.disabled = true));
+      $$("#q-options .glass-btn").forEach((x) => (x.disabled = true));
       b.classList.add("picked");
       $("#q-reaction").innerHTML = item.r[idx];
       setTimeout(() => {
@@ -195,8 +214,10 @@ function dodge(e) {
     y = pad + Math.random() * Math.max(10, innerHeight - h - pad * 2);
     if (!clash(x, y)) break;
   }
-  no.style.left = x + "px";
-  no.style.top = y + "px";
+  // backdrop-filter kartochkani "fixed" uchun koordinata boshiga aylantiradi
+  const cr = $("#card").getBoundingClientRect();
+  no.style.left = x - cr.left + "px";
+  no.style.top = y - cr.top + "px";
 }
 ["pointerenter", "pointerdown", "click", "touchstart"].forEach((ev) => no.addEventListener(ev, dodge, { passive: false }));
 

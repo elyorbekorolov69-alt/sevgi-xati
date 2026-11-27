@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#ffd9df">
+  <meta name="theme-color" content="#c99a6b">
   <title>Sizga kichik maktub</title>
   <meta name="description" content="Ochib ko'ring, qisqa bir ajablanish bor.">
   <meta property="og:type" content="website">
@@ -21,43 +21,28 @@
   <meta name="twitter:image" content="https://elyorbekorolov69-alt.github.io/sevgi-xati/og-image.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Lora:ital,wght@0,500;0,600;1,500&family=Nunito+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lora:ital,wght@0,500;0,600;1,500&family=Nunito+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="sky" aria-hidden="true">
-    <div class="sun"></div>
-    <div class="cloud c1"></div>
-    <div class="cloud c2"></div>
-    <div class="cloud c3"></div>
-  </div>
+  <div id="bg" aria-hidden="true"></div>
+  <video id="intro" muted playsinline preload="auto" poster="assets/bg.jpg" aria-hidden="true">
+    <source src="assets/intro.mp4" type="video/mp4">
+  </video>
   <canvas id="petals" aria-hidden="true"></canvas>
 
   <!-- Eshik -->
   <div id="gate">
     <div class="gate-box">
       <p class="script-big">Sizga xat bor</p>
-      <button class="btn yes" id="start" type="button">&#128140; Ochish</button>
+      <button class="glass-btn" id="start" type="button">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="3" fill="#e9798f"/><path d="M3.5 7l8.5 6 8.5-6" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Ochish
+      </button>
     </div>
   </div>
 
-  <!-- Kabutar va xat -->
-  <div id="intro" hidden>
-    <svg id="bird" viewBox="-20 -130 340 300" aria-hidden="true"></svg>
-    <div id="shadow"></div>
-    <div id="letter">
-      <svg viewBox="0 0 64 44" aria-hidden="true">
-        <defs><linearGradient id="paperG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffaf3"/><stop offset="1" stop-color="#f6dfd0"/></linearGradient></defs>
-        <rect x="1" y="1" width="62" height="42" rx="3" fill="url(#paperG)" stroke="#e3c3b0"/>
-        <path d="M1 3 L32 25 L63 3" fill="none" stroke="#dcb9a3" stroke-width="1.6"/>
-        <path d="M1 42 L24 21 M63 42 L40 21" stroke="#ebd0bd" stroke-width="1.2"/>
-        <circle cx="32" cy="25" r="6.5" fill="#d9748f"/>
-        <path d="M32 20.5l1.3 3.3 3.3 1.3-3.3 1.3L32 29.7l-1.3-3.3-3.3-1.3 3.3-1.3z" fill="#fff0d2"/>
-      </svg>
-    </div>
-    <button class="skip" id="skip" type="button">O'tkazib yuborish</button>
-  </div>
-  <div id="bloom"></div>
+  <button class="skip" id="skip" type="button" hidden>O'tkazib yuborish</button>
 
   <!-- Asosiy sahifa -->
   <main class="page" id="page" hidden>
@@ -69,7 +54,7 @@
         <h1 class="hello">Assalomu alaykum<span class="her"></span></h1>
         <p class="body">Siz bilan gaplashish menga yoqayapti.</p>
         <p class="body">Lekin buni o'zingizga aytishga sal ikkilanib turibman, shuning uchun sayt qilishga to'g'ri keldi &#128517;</p>
-        <button class="btn yes" data-next="s2" type="button">Davom etish</button>
+        <button class="glass-btn" data-next="s2" type="button">Davom etish</button>
       </div>
 
       <!-- 2. Jasorat yuklanmoqda -->
@@ -78,7 +63,7 @@
         <div class="loader"><i id="bar"></i></div>
         <p class="pct" id="pct">0%</p>
         <p class="reaction" id="load-msg" aria-live="polite"></p>
-        <button class="btn yes" id="load-next" data-next="s3" type="button" hidden>Mayli, ayta qolay</button>
+        <button class="glass-btn" id="load-next" data-next="s3" type="button" hidden>Mayli, ayta qolay</button>
       </div>
 
       <!-- 3. Hazilli savollar -->
@@ -100,7 +85,7 @@
           <button type="button" data-v="5" aria-label="5 yulduz">&#9733;</button>
         </div>
         <p class="reaction" id="star-msg" aria-live="polite"></p>
-        <button class="btn yes" id="star-next" data-next="s5" type="button" hidden>Davom etish</button>
+        <button class="glass-btn" id="star-next" data-next="s5" type="button" hidden>Davom etish</button>
       </div>
 
       <!-- 5. Asosiy savol -->
@@ -108,8 +93,8 @@
         <h2 class="big">Men bilan do'st bo'lasizmi?</h2>
         <p class="small">Faqat halol niyat bilan so'rayapman.</p>
         <div class="answers" id="answers">
-          <button class="btn yes" id="yes" type="button">Ha &#128155;</button>
-          <button class="btn no" id="no" type="button">Yo'q</button>
+          <button class="glass-btn yes" id="yes" type="button">Ha &#128155;</button>
+          <button class="glass-btn no" id="no" type="button">Yo'q</button>
         </div>
         <p class="hint" id="no-hint" aria-live="polite"></p>
         <button class="linkbtn" id="polite" type="button">Rahmat, hozircha shart emas</button>
@@ -117,12 +102,11 @@
 
       <!-- 6. Ha -->
       <div class="stage" id="s6">
-        <div class="emoji-big" aria-hidden="true">&#127800;</div>
+        <div class="emoji-big" aria-hidden="true">&#128140;</div>
         <h2>Rahmat!</h2>
         <p class="body">Xursand bo'ldim. Qulay paytingizda shu yerdan yozing, shoshilmayman. Bir kun nima deysiz ekan, kutaman &#128522;</p>
         <div class="contacts" data-contacts></div>
       </div>
-
 
       <!-- 8. Hozircha shart emas -->
       <div class="stage" id="s8">
@@ -137,7 +121,6 @@
   <canvas id="fx" aria-hidden="true"></canvas>
   <button id="music" class="music" type="button" aria-label="Musiqani yoqish">&#9834;</button>
 
-  <script src="dove.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
