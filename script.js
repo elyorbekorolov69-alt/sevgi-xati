@@ -4,8 +4,8 @@ const CONFIG = {
   telegram: "Urolov20_05",    // Telegram username, @ belgisiz. Masalan: "elyor123"
   telegramText: "Assalomu alaykum, maktubingizni oldim",  // Telegram chatida tayyor turadigan yozuv (bo'sh qolsa, chat bo'sh ochiladi)
   instagram: "",   // Instagram username, @ belgisiz. Masalan: "elyor.123"
-  tgToken: "",     // Javoblar sizga kelishi uchun: Telegram bot tokeni (@BotFather beradi)
-  tgChat: ""       // Sizning chat ID raqamingiz (@userinfobot aytadi)
+  tgToken: "9182396915:AAG8ZDeHbKdHAV7kEi7bvhiKQ22zMVAcp9o",     // Javoblar sizga kelishi uchun: Telegram bot tokeni (@BotFather beradi)
+  tgChat: "8799728118"       // Sizning chat ID raqamingiz (@userinfobot aytadi)
 };
 // =====================================================
 
