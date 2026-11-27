@@ -69,8 +69,8 @@ function startLoading() {
   loadTimer = setInterval(() => {
     if (stalled) return;
     set(Math.min(87, v + 1 + Math.random() * 2));
-    if (v > 20 && v < 40) msg.innerHTML = "Biroz ikkilanish topildi...";
-    if (v >= 60 && v < 80) msg.innerHTML = "Yuragim tez ura boshladi...";
+    const steps = [[10, "Salom aytish mashq qilinyapti..."], [28, "Biroz ikkilanish topildi..."], [48, "Ovoz ravonlashtirilyapti..."], [68, "Yuragim tez ura boshladi..."], [80, "Oxirgi tayyorgarlik..."]];
+    for (const [at, text] of steps) if (v >= at) msg.innerHTML = text;
     if (v >= 87) {
       stalled = true;
       msg.innerHTML = "Qolgan 13% kelmayapti &#128517;";
@@ -88,7 +88,11 @@ function startLoading() {
 const QUIZ = [
   { q: "Ishxonada eng yaxshi payt qaysi?", a: ["Choy tanaffusi &#9749;", "Maosh kuni &#128516;", "Dam olish kuni yaqinlashganda"], r: ["Choy tanaffusini hech kim yomon ko'rmaydi", "Bu javobga hamma qo'shiladi", "Juma kuni soat 17:00 &#128513;"] },
   { q: "Suhbatda sizga nima yoqadi?", a: ["Samimiylik", "Yengil hazil", "Ikkalasi ham"], r: ["Men ham shunday o'ylayman", "Hazilga hazil bilan javob beraman &#128521;", "Demak, til topishamiz"] },
-  { q: "Tanishish uchun sayt yasash qanday fikr?", a: ["G'alati &#128517;", "Qiziq", "Chiroyli fikr"], r: ["Rostini aytganingiz uchun rahmat &#128514;", "Qiziqish yaxshi belgi", "Rahmat, ancha tirishdim &#128522;"] }
+  { q: "Dushanba ertalab qanday kayfiyatda bo'lasiz?", a: ["Hali uyquda &#128564;", "Choy bo'lsa tirilaman &#9749;", "Dushanbani yaxshi ko'raman"], r: ["Hammamiz bir qayiqdamiz &#128516;", "Choy ishxonaning yoqilg'isi", "Siz noyob odamsiz &#128563;"] },
+  { q: "Ishxonada kompyuter qotib qolsa, nima qilasiz?", a: ["Sabr bilan kutaman", "Qayta yoqaman", "Yordam so'rayman"], r: ["Sabr qilgan murodiga yetadi &#128522;", "Eng sinalgan usul &#128514;", "Yordam so'rash aqlli ish"] },
+  { q: "Telefoningizda nechta o'qilmagan xabar bor?", a: ["Nolta, tartibliman", "Yigirmatacha", "Sanashdan qo'rqaman"], r: ["Menga ham o'rgating &#128517;", "Men ham shunga yaqinman", "Sanamang, yaxshisi &#128514;"] },
+  { q: "Bu sahifani yasash qancha vaqt oldi deb o'ylaysiz?", a: ["Bir daqiqa", "Bir kecha", "Butun hafta"], r: ["Kaş shunchalik tez bo'lsa &#128516;", "Juda yaqin topdingiz", "Deyarli shunday, sabringiz uchun rahmat &#128522;"] },
+  { q: "Sahifa shu yergacha yoqdimi?", a: ["Ha, yoqdi", "Ozgina kulgim keldi", "Davom eting-chi"], r: ["Xursand bo'ldim &#128522;", "Maqsad ham shu edi &#128516;", "Oz qoldi, sabr qiling"] }
 ];
 let qi = 0;
 function startQuiz() { qi = 0; showQuestion(); }
@@ -155,8 +159,7 @@ const THINK = [
   "Yana bir bor o'ylab ko'ring",
   "Tugma ham ketvoldi &#128517;",
   "O'ylab ko'rish hech kimga zarar qilmagan",
-  "Yana urinib ko'ring",
-  "Men charchadim..."
+  "Yana bir bor o'ylab ko'ring &#128522;"
 ];
 let dodges = 0;
 function dodge(e) {
@@ -164,16 +167,36 @@ function dodge(e) {
   if (no.classList.contains("gone")) return;
   dodges++;
   no.innerHTML = "Yo'q";
-  hint.innerHTML = THINK[Math.min(dodges - 1, THINK.length - 1)];
+  hint.innerHTML = THINK[(dodges - 1) % THINK.length];
   no.style.position = "fixed";
   const pad = 14, w = no.offsetWidth, h = no.offsetHeight;
-  no.style.left = pad + Math.random() * Math.max(10, innerWidth - w - pad * 2) + "px";
-  no.style.top = pad + Math.random() * Math.max(10, innerHeight - h - pad * 2) + "px";
-  yes.style.transform = `scale(${Math.min(1 + dodges * 0.07, 1.4)})`;
-  if (dodges >= 8) {
-    no.classList.add("gone");
-    hint.innerHTML = "&laquo;Yo'q&raquo; tugmasi dam olishga ketdi &#128564;";
+  if (!no.dataset.moved) {
+    // Tugma oqimdan chiqqanda boshqa elementlar siljib ketmasin
+    const sp = document.createElement("span");
+    sp.style.cssText = `display:inline-block;width:${w}px;height:${h}px`;
+    no.parentNode.insertBefore(sp, no);
+    no.dataset.moved = "1";
   }
+  const sc = Math.min(1 + dodges * 0.07, 1.4);
+  yes.style.transform = `scale(${sc})`;
+  // "Ha" tugmasi (kattalashganini hisobga olib), kichik havola va musiqa tugmasi ustiga tushmasin
+  const yr = yes.getBoundingClientRect();
+  const cx = yr.left + yr.width / 2, cy = yr.top + yr.height / 2;
+  const yw = (yes.offsetWidth * sc) / 2, yh = (yes.offsetHeight * sc) / 2;
+  const avoid = [
+    { left: cx - yw, right: cx + yw, top: cy - yh, bottom: cy + yh },
+    $("#polite").getBoundingClientRect(),
+    $("#music").getBoundingClientRect()
+  ];
+  const clash = (x, y) => avoid.some((r) => x < r.right + 12 && x + w > r.left - 12 && y < r.bottom + 12 && y + h > r.top - 12);
+  let x = pad, y = pad;
+  for (let i = 0; i < 60; i++) {
+    x = pad + Math.random() * Math.max(10, innerWidth - w - pad * 2);
+    y = pad + Math.random() * Math.max(10, innerHeight - h - pad * 2);
+    if (!clash(x, y)) break;
+  }
+  no.style.left = x + "px";
+  no.style.top = y + "px";
 }
 ["pointerenter", "pointerdown", "click", "touchstart"].forEach((ev) => no.addEventListener(ev, dodge, { passive: false }));
 
@@ -181,7 +204,6 @@ yes.addEventListener("click", () => {
   go("s6");
   burst(innerWidth / 2, innerHeight * 0.55, 160, 40);
 });
-$("#think").addEventListener("click", () => go("s7"));
 $("#polite").addEventListener("click", () => go("s8"));
 
 /* ---------- Tushayotgan gul barglari ---------- */
