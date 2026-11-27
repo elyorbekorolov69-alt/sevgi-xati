@@ -3,7 +3,9 @@ const CONFIG = {
   herName: "",     // uning ismi (bo'sh qolsa, ko'rsatilmaydi)
   telegram: "Urolov20_05",    // Telegram username, @ belgisiz. Masalan: "elyor123"
   telegramText: "Assalomu alaykum, maktubingizni oldim",  // Telegram chatida tayyor turadigan yozuv (bo'sh qolsa, chat bo'sh ochiladi)
-  instagram: ""    // Instagram username, @ belgisiz. Masalan: "elyor.123"
+  instagram: "",   // Instagram username, @ belgisiz. Masalan: "elyor.123"
+  tgToken: "",     // Javoblar sizga kelishi uchun: Telegram bot tokeni (@BotFather beradi)
+  tgChat: ""       // Sizning chat ID raqamingiz (@userinfobot aytadi)
 };
 // =====================================================
 
@@ -11,6 +13,29 @@ const $ = (s) => document.querySelector(s);
 const $$ = (s) => [...document.querySelectorAll(s)];
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+/* ---------- Javoblarni egasiga yuborish (Telegram bot) ---------- */
+const answersLog = [];
+let sentCount = 0;
+const plain = (h) => String(h).replace(/&#\d+;/g, "").replace(/&[a-z]+;/g, "").trim();
+function logAnswer(line) { answersLog.push(plain(line)); }
+function flushAnswers(title) {
+  if (!CONFIG.tgToken || !CONFIG.tgChat) return;
+  const fresh = answersLog.slice(sentCount);
+  if (!fresh.length) return;
+  sentCount = answersLog.length;
+  const text = (title ? title + "\n" : "") + fresh.join("\n");
+  try {
+    fetch(`https://api.telegram.org/bot${CONFIG.tgToken}/sendMessage`, {
+      method: "POST", keepalive: true,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: CONFIG.tgChat, text })
+    }).catch(() => {});
+  } catch (e) {}
+}
+addEventListener("pagehide", () => flushAnswers("(sahifadan chiqdi)"));
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") flushAnswers("(sahifadan chiqdi)"); });
+if (CONFIG.tgToken && CONFIG.tgChat) $$("[data-notice]").forEach((el) => (el.hidden = false));
 
 /* ---------- Ism va kontaktlar ---------- */
 if (CONFIG.herName) $$(".her").forEach((el) => (el.textContent = ", " + CONFIG.herName));
@@ -143,10 +168,11 @@ function showQuestion() {
       $$("#q-options .glass-btn").forEach((x) => (x.disabled = true));
       b.classList.add("picked");
       $("#q-reaction").innerHTML = item.r[idx];
+      logAnswer(`${qi + 1}. ${item.q} -> ${text}`);
       setTimeout(() => {
         qi++;
         if (qi < QUIZ.length) showQuestion();
-        else go("s4");
+        else { go("s4"); flushAnswers("Maktub: savollarga javoblari"); }
       }, 1400);
     });
     box.appendChild(b);
@@ -162,6 +188,7 @@ function showQuestion() {
     b.addEventListener("mouseenter", () => { if (!wrap.classList.contains("locked")) paint(+b.dataset.v); });
     b.addEventListener("click", () => {
       const v = +b.dataset.v;
+      logAnswer(`Baho: ${v} yulduz`);
       wrap.classList.add("locked");
       paint(v);
       if (v === 5) {
@@ -277,10 +304,16 @@ function dodge(e) {
 ["pointerenter", "pointerdown", "click", "touchstart"].forEach((ev) => no.addEventListener(ev, dodge, { passive: false }));
 
 yes.addEventListener("click", () => {
+  logAnswer(`HA bosildi (Yo'q ${dodges} marta qochdi)`);
+  flushAnswers("Maktub: YAKUNIY JAVOB");
   go("s6");
   burst(innerWidth / 2, innerHeight * 0.55, 160, 40);
 });
-$("#polite").addEventListener("click", () => go("s8"));
+$("#polite").addEventListener("click", () => {
+  logAnswer(`"Rahmat, hozircha shart emas" bosildi (Yo'q ${dodges} marta qochdi)`);
+  flushAnswers("Maktub: YAKUNIY JAVOB");
+  go("s8");
+});
 
 /* ---------- Tushayotgan gul barglari ---------- */
 const pc = $("#petals"), pctx = pc.getContext("2d");
